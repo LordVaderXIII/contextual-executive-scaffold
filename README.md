@@ -2,6 +2,8 @@
 
 **Open-source framework and reference implementation for externalising executive function in interest-based nervous systems.**
 
+**Status: This project is in active development. A working, usable version of the app will take significant time to become available. A lot may change from this initial design and reference implementation.**
+
 CES helps adults whose cognitive architecture delivers strong reward for insight, resolution and novelty but weak or absent reward for sustained execution on non-preferred tasks, routine maintenance, and post-insight follow-through. It supplies deliberate external structure — AI decomposition with implementation intentions, visual timelines, context-aware scaffolding, gentle accountability integrations, and system-building patterns — so that activation and completion do not depend on unreliable internal motivation.
 
 ## The Underlying Model (Generalised)
