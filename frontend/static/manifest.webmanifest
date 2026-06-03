@@ -1,0 +1,10 @@
+{
+  "name": "Contextual Executive Scaffold",
+  "short_name": "CES",
+  "description": "External executive function scaffolding",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f2eb",
+  "theme_color": "#5a9a96",
+  "icons": []
+}

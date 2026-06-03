@@ -4,7 +4,7 @@
 
 | Field | Value |
 |-------|-------|
-| Status | Planning only — implementation not started |
+| Status | MVP vertical slice implemented (see docs/REMAINING.md) |
 | Last updated | June 2026 |
 | Stack | FastAPI, SvelteKit PWA, external MariaDB, Home Assistant, OpenAI-compatible AI |
 
@@ -13,6 +13,7 @@
 | Date | Change |
 |------|--------|
 | 2026-06 | Initial build plan created from App Design Document v1.0 (May 2026) |
+| 2026-06 | MVP: backend API, migrations, SvelteKit PWA, local Docker + smoke |
 
 ---
 
@@ -398,4 +399,4 @@ Full citations and rationale belong in [docs/architecture/REFERENCE.md](docs/arc
 
 ---
 
-*Implementation begins only when explicitly requested. Start with Phase 1 in this document.*
+*MVP implements phases 1–4 core APIs and phase 5–6 subsets (export, pause, review). See [docs/REMAINING.md](docs/REMAINING.md).*
