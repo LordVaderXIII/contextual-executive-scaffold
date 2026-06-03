@@ -1,38 +1,93 @@
 # CES — Design architecture reference
 
-> **Status:** Stub. Replace this file (or add a linked file) with your full design export from Claude.
+**Status:** Imported from App Design Document v1.0 (May 2026) and `contextual-executive-scaffold.zip`. Technical build plan: [BUILD_PLAN.md](../../BUILD_PLAN.md).
 
-## Purpose of this document
+## Purpose and goals
 
-This is the **canonical design architecture reference** for Contextual Executive Scaffold: product goals, feature specifications, scientific rationale, data model intent, HA integration philosophy, and sustainability safeguards.
+CES is a self-hosted ADHD executive function support tool that externalises structure where internal regulation is weakest: initiation and completion of non-preferred tasks, home attentiveness, hyperfocus containment, and location-based priority shifts.
 
-The [BUILD_PLAN.md](../../BUILD_PLAN.md) in the repo root translates this design into a technical implementation plan (FastAPI, SvelteKit, external MariaDB on Unraid, phases, API list).
+**Core objectives**
 
-## What to paste here
+- External structure where internal regulation is weakest.
+- Context-appropriate behaviour (work/study at work; home routines and wind-down at home).
+- Gentle, user-controlled persistence — not punitive nagging.
+- Self-insight through logging and reflection.
+- Maintainable on Unraid with full data ownership.
 
-Import your **App Design Document** (e.g. “CONTEXTUAL EXECUTIVE SCAFFOLD (CES) — App Design Document v1.0, May 2026”), including:
+## System architecture
 
-1. Purpose and goals  
-2. System architecture (stack, HA, location/context)  
-3. Core features with scientific basis (§3.1–3.6)  
-4. Data model (MariaDB tables)  
-5. AI usage strategy  
-6. Implementation roadmap (MVP phases)  
-7. Sustainability and health safeguards  
-8. Evidence / references  
+| Layer | Choice |
+|-------|--------|
+| Database | MariaDB (`ces`, utf8mb4) — external in production; disposable container for local test |
+| Backend | FastAPI, SQLAlchemy 2, Alembic |
+| Frontend | SvelteKit static PWA, nginx proxy to API |
+| Context | Home Assistant zones + manual override + last-known fallback |
+| AI | OpenAI-compatible, on-demand only, cached by input hash |
+| Nudges | User rules → HA actions + in-app banner; outcomes logged |
 
-Alternatively, save a copy as `docs/design/CES-App-Design-v1.0.md` and replace this file with a short index that links to it.
+```mermaid
+flowchart LR
+  PWA[SvelteKit PWA] --> API[FastAPI]
+  API --> DB[(MariaDB)]
+  API --> HA[Home Assistant]
+  HA -->|webhooks| API
+```
 
-## Quick summary (until full import)
+## Core features (design §3)
 
-Until you paste the full document, the following summary anchors the repo:
+1. **Location-aware context switching** — HA zones map to context slugs; dashboard filters tasks.
+2. **AI decomposition + implementation intentions** — “Break this down”; cache and manual paste supported on API.
+3. **Visual timeline + timers** — Day view of tasks and focus sessions; focus start API.
+4. **Hyperfocus containment** — `session_type: hyperfocus` with `end_condition`.
+5. **Gentle persistence** — Nudge rules, evaluate endpoint, snooze/dismiss-for-today, pause mode.
+6. **Reflection** — End-of-block logs; weekly review aggregates nudges and reflections.
 
-- **Host:** Unraid Docker; **database:** external MariaDB (not in CES compose).  
-- **Stack:** FastAPI backend, SvelteKit PWA, Home Assistant for zones and gentle nudges, OpenAI-compatible AI on-demand only.  
-- **Principles:** External structure without punitive nagging; user-owned data; context-aware task surfacing; hyperfocus containment; reflection logging.
+## Data model (MariaDB)
 
-See [BUILD_PLAN.md](../../BUILD_PLAN.md) for technical phases and schema extensions planned for MVP.
+| Table | Purpose |
+|-------|---------|
+| `contexts` | Named contexts, `location_rules` JSON, `accent_hue` for UI |
+| `tasks` | Description, status, AI decomposition, implementation intention |
+| `focus_sessions` | normal / hyperfocus timers |
+| `nudge_rules` / `nudges` | Rules and fire outcomes |
+| `ai_interactions` | Cache and audit trail |
+| `reflection_logs` | worked / blocked / note |
+| `app_settings` | pause mode, context override, dismiss-until |
 
----
+## AI usage strategy
 
-*After importing, delete or shorten the “Quick summary” section above so this file is not duplicated.*
+- Triggers: user actions only (no background polling).
+- Cache: `input_hash` on normalised input + `prompt_type`.
+- Degraded local behaviour: template micro-steps when `OPENAI_API_KEY` absent.
+
+## Home Assistant
+
+- Inbound: `POST /api/v1/webhooks/ha` with `X-HA-Secret`; actions `CES_SNOOZE_60`, `CES_MARK_REVIEWED`, evaluate trigger.
+- Outbound: `GET /api/v1/ha/zones`, `POST /api/v1/ha/execute` (mock when token missing).
+- Examples: [docs/ha-examples.yaml](../ha-examples.yaml).
+
+## Sustainability safeguards
+
+- Pause mode disables nudge evaluation.
+- No auto-escalation; dismiss-for-today honoured.
+- Export via `GET /api/v1/export`.
+- User-owned data on self-hosted infra.
+
+## Evidence (summary)
+
+- Implementation intentions (Gollwitzer): medium-to-large effects on goal attainment.
+- Time externalisation: compensatory visual timers for time perception deficits.
+- Gentle accountability: salient, autonomy-preserving nudges.
+- Organisational skills training and context-dependent cueing for adults with ADHD.
+
+Full interactive prototype and screen flows: [docs/design/README.md](../design/README.md).
+
+## Local vs production
+
+| | Local Docker | Production (Unraid) |
+|---|--------------|---------------------|
+| DB | `db` service in compose | External MariaDB LAN IP |
+| Secrets | Optional / mock | `CES_API_KEY`, `HA_TOKEN`, `OPENAI_API_KEY` |
+| HTTPS | HTTP localhost | Reverse proxy for iOS PWA |
+
+See [docs/REMAINING.md](../REMAINING.md) for post-MVP work.

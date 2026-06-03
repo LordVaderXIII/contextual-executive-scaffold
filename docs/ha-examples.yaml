@@ -1,0 +1,32 @@
+# CES Home Assistant examples — gentle, user-controlled nudges
+# See README.md for philosophy. Configure HA_WEBHOOK_SECRET and HA_TOKEN in production.
+
+- alias: "CES Gentle Context Nudge"
+  description: "Low-salience external prompt for pending tasks"
+  trigger:
+    - platform: time
+      at: "20:00:00"
+  action:
+    - service: rest_command.ces_evaluate_nudges
+  mode: single
+
+# rest_command (configuration.yaml):
+# rest_command:
+#   ces_evaluate_nudges:
+#     url: "http://ces-api-host:8000/api/v1/nudges/evaluate"
+#     method: POST
+#     headers:
+#       X-API-Key: !secret ces_api_key
+
+- alias: "CES Webhook — Snooze from notification"
+  trigger:
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "CES_SNOOZE_60"
+  action:
+    - service: rest_command.ces_ha_webhook
+      data:
+        action: "CES_SNOOZE_60"
+
+# rest_command.ces_ha_webhook posts to /api/v1/webhooks/ha with X-HA-Secret header

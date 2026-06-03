@@ -2,7 +2,7 @@
 
 **Open-source framework and reference implementation for externalising executive function in interest-based nervous systems.**
 
-**Status: This project is in active development. A working, usable version of the app will take significant time to become available. A lot may change from this initial design and reference implementation.**
+**Status: MVP vertical slice in development** — runnable locally via Docker (disposable MariaDB + API + SvelteKit PWA). Production Unraid deployment uses external MariaDB; see [deploy/README.md](deploy/README.md) and [docs/REMAINING.md](docs/REMAINING.md).
 
 CES helps adults whose cognitive architecture delivers strong reward for insight, resolution and novelty but weak or absent reward for sustained execution on non-preferred tasks, routine maintenance, and post-insight follow-through. It supplies deliberate external structure — AI decomposition with implementation intentions, visual timelines, context-aware scaffolding, gentle accountability integrations, and system-building patterns — so that activation and completion do not depend on unreliable internal motivation.
 
@@ -87,9 +87,21 @@ This is a public resource. Fork, adapt, contribute patterns that work for your s
 
 ## Getting Started
 
-**Planning:** Implementation has not started. See the [build plan](BUILD_PLAN.md) for phases, stack, and Unraid/MariaDB deployment. Import your full app design into [docs/architecture/](docs/architecture/) (canonical reference: [REFERENCE.md](docs/architecture/REFERENCE.md)).
+### Local (disposable test stack)
 
-When the reference stack exists, clone, deploy the Docker compose under `/deploy`, point `DATABASE_URL` at your external MariaDB, configure contexts and Home Assistant, then use the PWA to generate micro-steps and plans. Review logs weekly and refine.
+```bash
+docker compose -f deploy/docker-compose.yml up -d db ces-api ces-web
+./scripts/smoke.sh
+```
+
+- PWA: http://localhost:8080  
+- API docs: http://localhost:8000/docs  
+
+### Production (Unraid)
+
+See [BUILD_PLAN.md](BUILD_PLAN.md) section 10: external MariaDB, `CES_API_KEY`, optional `HA_TOKEN` and `OPENAI_API_KEY`. Copy [deploy/.env.example](deploy/.env.example) for variable names (do not commit secrets).
+
+Design reference: [docs/architecture/REFERENCE.md](docs/architecture/REFERENCE.md). Post-MVP gaps: [docs/REMAINING.md](docs/REMAINING.md).
 
 ## Contributing
 
