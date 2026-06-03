@@ -87,7 +87,9 @@ This is a public resource. Fork, adapt, contribute patterns that work for your s
 
 ## Getting Started
 
-Clone, deploy the reference Docker stack (examples in /deploy), configure contexts if desired, and begin using the interface to generate micro-steps and plans. Review logs weekly and refine.
+**Planning:** Implementation has not started. See the [build plan](BUILD_PLAN.md) for phases, stack, and Unraid/MariaDB deployment. Import your full app design into [docs/architecture/](docs/architecture/) (canonical reference: [REFERENCE.md](docs/architecture/REFERENCE.md)).
+
+When the reference stack exists, clone, deploy the Docker compose under `/deploy`, point `DATABASE_URL` at your external MariaDB, configure contexts and Home Assistant, then use the PWA to generate micro-steps and plans. Review logs weekly and refine.
 
 ## Contributing
 
